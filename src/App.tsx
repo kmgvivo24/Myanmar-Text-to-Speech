@@ -468,18 +468,18 @@ export default function App() {
 
         <div className="hidden md:flex gap-6 text-sm font-semibold text-slate-600">
           <a href="#" className="text-indigo-600 border-b-2 border-indigo-600 py-5 px-1">Studio Dashboard</a>
-          <a href="#" className="hover:text-indigo-600 transition py-5 px-1">Voice Library</a>
-          <a href="#" className="hover:text-indigo-600 transition py-5 px-1">API Keys</a>
-          <a href="#" className="hover:text-indigo-600 transition py-5 px-1">Help Docs</a>
+          <a href="https://www.mmitsg.com" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600 transition py-5 px-1">MMITS</a>
+          <a href="https://pos.mmitsg.com" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600 transition py-5 px-1">POS</a>
+          <a href="https://shop.mmitsg.org" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600 transition py-5 px-1">Buy Now</a>
         </div>
 
         <div className="flex items-center gap-4">
           <div className="flex flex-col items-end text-right">
-            <span className="text-xs sm:text-sm font-bold text-slate-800">komgvivo24@gmail.com</span>
-            <span className="text-[10px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wider">Enterprise Plan</span>
+            <span className="text-xs sm:text-sm font-bold text-slate-800">Enterprise Workspace</span>
+            <span className="text-[10px] sm:text-xs text-indigo-600 font-bold uppercase tracking-wider">Active Member</span>
           </div>
           <div className="w-9 h-9 rounded-full bg-indigo-100 border-2 border-white shadow-sm flex items-center justify-center text-indigo-700 font-bold text-sm">
-            K
+            E
           </div>
         </div>
       </nav>
