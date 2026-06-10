@@ -1,0 +1,6 @@
+{
+  "name": "Myanmar Text to Speech",
+  "description": "A high-quality, AI-powered Myanmar (Burmese) Text-to-Speech (TTS) converter with customized prebuilt voices, tones, customizable speed, quick presets, and local history.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
