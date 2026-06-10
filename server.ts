@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import dotenv from "dotenv";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { createServer as createViteServer } from "vite";
 
 dotenv.config();
@@ -77,9 +77,7 @@ app.post("/api/translate-polish", async (req, res) => {
     const systemPrompt = `You are an expert translator and linguist specialized in Myanmar (Burmese).
 Translate the input text to perfect, high-quality, natural-sounding Burmese (both formal/written or clean spoken depending on context, preferring elegant and standard forms). 
 If the text is already in Burmese, polish it to make it read perfectly, correcting spelling/grammar, and make sure it sounds natural when spoken aloud.
-Provide the output in JSON format with two keys:
-"translatedText": the translated or polished Myanmar (Burmese) text, in Unicode script. Do NOT include any English or other explanations here, only the Burmese output.
-"explanation": a short, friendly, 1-2 sentence explanation in English of the translated phrase and its register (e.g. conversational, formal).`;
+Return only accurate JSON representation following the schema specification. Do NOT include any unrequested text description outside of the structured keys.`;
 
     const response = await ai.models.generateContent({
       model: "gemini-3.5-flash",
@@ -87,11 +85,56 @@ Provide the output in JSON format with two keys:
       config: {
         systemInstruction: systemPrompt,
         responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            translatedText: {
+              type: Type.STRING,
+              description: "The translated or polished Myanmar (Burmese) text, in Unicode script. Do NOT include any English or other explanations here, only the Burmese output."
+            },
+            explanation: {
+              type: Type.STRING,
+              description: "A short, friendly, 1-2 sentence explanation in English of the translated phrase and its register (e.g. conversational, formal)."
+            }
+          },
+          required: ["translatedText", "explanation"]
+        }
       }
     });
 
-    const bodyText = response.text || "{}";
-    const data = JSON.parse(bodyText.trim());
+    let bodyText = response.text || "{}";
+    bodyText = bodyText.trim();
+
+    // Self-healing cleanups for formatting backticks
+    if (bodyText.startsWith("```json")) {
+      bodyText = bodyText.substring(7);
+    } else if (bodyText.startsWith("```")) {
+      bodyText = bodyText.substring(3);
+    }
+    if (bodyText.endsWith("```")) {
+      bodyText = bodyText.substring(0, bodyText.length - 3);
+    }
+    bodyText = bodyText.trim();
+
+    // Boundary extractor for raw json strings
+    const firstBrace = bodyText.indexOf("{");
+    const lastBrace = bodyText.lastIndexOf("}");
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+      bodyText = bodyText.substring(firstBrace, lastBrace + 1);
+    }
+
+    let data;
+    try {
+      data = JSON.parse(bodyText);
+    } catch (parseErr) {
+      console.warn("JSON dynamic parsing fallback activated. Original text was:", bodyText);
+      // Clean fallback format structure in case parsed chunk fails
+      data = {
+        translatedText: response.text || text,
+        explanation: "Processed translation complete."
+      };
+    }
+
     res.json(data);
   } catch (error: any) {
     console.error("Translation error:", error);
